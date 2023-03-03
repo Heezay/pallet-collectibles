@@ -1,10 +1,12 @@
+//! The crate's tests.
+
 #[cfg(test)]
 mod tests;
 
 use crate as pallet_collectibles;
 use frame_support::{
 	assert_noop, assert_ok,
-	traits::{ConstU16, ConstU32, ConstU64},
+	traits::{ConstU16, ConstU32, ConstU64, Currency},
 };
 use frame_system as system;
 
@@ -19,7 +21,10 @@ pub const U64_MAX: u64 = u64::MAX;
 type UncheckedExtrinsic = frame_system::mocking::MockUncheckedExtrinsic<Test>;
 type Block = frame_system::mocking::MockBlock<Test>;
 type Balance = u64;
-// type AccountStore = frame_system::Pallet<Test>;
+// TODO: Resolve problem with Err(InsufficientBalance)
+// type DepositBalanceOf<T> = <<T as pallet_collectibles::Config>::Currency as Currency<
+// 	<T as frame_system::Config>::AccountId,
+// >>::Balance;
 
 // Configure a mock runtime to test the pallet.
 frame_support::construct_runtime!(
@@ -88,6 +93,12 @@ pub fn new_test_ext() -> sp_io::TestExternalities {
 	system::GenesisConfig::default().build_storage::<Test>().unwrap().into()
 }
 
+// Test environment function to call origin
+fn origin_for(account_id: u64) -> system::RawOrigin<u64> {
+	system::Origin::<Test>::Signed(account_id)
+}
+
+// Test environment function to create collectible and return it
 fn create_collectible() -> ([u8; 16], u64) {
 	let (unique_id, color) = CollectiblesModule::gen_unique_id();
 	let minter: u64 = 1;

@@ -1,30 +1,27 @@
 use super::*;
-use crate::{CollectibleMap, CollectiblesCount, OwnerOfCollectibles};
 use pallet_collectibles::{Error, Event};
-use system::Origin;
 
 #[test]
 fn mint_collectible() {
 	new_test_ext().execute_with(|| {
 		System::set_block_number(1);
 		let (collectible_id, color) = CollectiblesModule::gen_unique_id();
+
 		let minter: u64 = 1;
 		let mint = CollectiblesModule::mint(&minter, collectible_id, color).unwrap();
 		println!("mint: {:?}", mint);
-		let count = CollectiblesCount::<Test>::get();
+
+		let count = crate::CollectiblesCount::<Test>::get();
+		// Ensure it will panic if count of collectibles is more than U64::MAX
 		assert_noop!(
 			count.checked_add(U64_MAX).ok_or(Error::<Test>::BoundsOverflow),
 			Error::<Test>::BoundsOverflow
 		);
-		let _collection = 1000;
-		// assert_noop!(
-		// 	OwnerOfCollectibles::<Test>::try_append(&minter, collection.into()),
-		// 	Error::<Test>::MaximumCollectiblesOwned
-		// );
 		System::assert_has_event(tests::RuntimeEvent::CollectiblesModule(
 			Event::<Test>::CollectibleCreated { collectible: collectible_id, owner: minter },
 		));
-		assert!(CollectibleMap::<Test>::contains_key(collectible_id));
+		// Ensure CollectibleMap was append with new generated collectible
+		assert!(crate::CollectibleMap::<Test>::contains_key(collectible_id));
 	})
 }
 
@@ -36,7 +33,7 @@ fn transfer_collectible() {
 		let receiver: u64 = 2;
 		let fake_id = 3;
 		assert_ok!(CollectiblesModule::transfer(
-			Origin::<Test>::Signed(minter).into(),
+			origin_for(minter).into(),
 			receiver,
 			collectible_id
 		));
@@ -48,47 +45,50 @@ fn transfer_collectible() {
 			},
 		));
 		assert_noop!(
-			CollectiblesModule::transfer(
-				Origin::<Test>::Signed(receiver).into(),
-				receiver,
-				collectible_id
-			),
+			CollectiblesModule::transfer(origin_for(receiver).into(), receiver, collectible_id),
 			Error::<Test>::TransferToSelf
 		);
 		assert_noop!(
-			CollectiblesModule::transfer(
-				Origin::<Test>::Signed(fake_id).into(),
-				receiver,
-				collectible_id
-			),
+			CollectiblesModule::transfer(origin_for(fake_id).into(), receiver, collectible_id),
 			Error::<Test>::NotOwner
 		);
 	});
 }
 
 #[test]
-fn set_price_for_collectible() {
+fn set_price_and_buy_collectible() {
 	new_test_ext().execute_with(|| {
 		System::set_block_number(1);
 		let (collectible_id, minter) = create_collectible();
 		let receiver = 2;
-		let new_price = 1000;
-		CollectiblesModule::set_price(
-			Origin::<Test>::Signed(minter).into(),
-			collectible_id,
-			Some(new_price),
-		)
-		.unwrap();
+		let new_price = 100;
+		CollectiblesModule::set_price(origin_for(minter).into(), collectible_id, Some(new_price))
+			.unwrap();
 		System::assert_has_event(tests::RuntimeEvent::CollectiblesModule(
 			Event::<Test>::PriceSet { collectible: collectible_id, price: Some(new_price) },
 		));
 		assert_noop!(
 			CollectiblesModule::set_price(
-				Origin::<Test>::Signed(receiver).into(),
+				origin_for(receiver).into(),
 				collectible_id,
-				Some(0),
+				Some(new_price),
 			),
 			Error::<Test>::NotOwner
+		);
+		System::reset_events();
+		System::set_block_number(2);
+		let _selected_price: u64 = 101;
+		// TODO: Resolve problem with Err(InsufficientBalance)
+		// Currency::<Test>::deposit_creating(&receiver.into(), DepositBalanceOf::<Test>::max_value());
+		// CollectiblesModule::buy_collectible(
+		// 	origin_for(receiver).into(),
+		// 	collectible_id,
+		// 	selected_price,
+		// )
+		// .unwrap();
+		assert_noop!(
+			CollectiblesModule::buy_collectible(origin_for(receiver).into(), collectible_id, 0,),
+			Error::<Test>::BidPriceTooLow
 		);
 	})
 }
