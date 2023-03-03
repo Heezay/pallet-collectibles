@@ -5,6 +5,7 @@
 /// <https://docs.substrate.io/reference/frame-pallets/>
 pub use pallet::*;
 
+#[cfg(test)]
 pub mod tests;
 
 #[cfg(feature = "runtime-benchmarks")]

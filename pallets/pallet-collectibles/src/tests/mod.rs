@@ -94,12 +94,12 @@ pub fn new_test_ext() -> sp_io::TestExternalities {
 }
 
 // Test environment function to call origin
-fn origin_for(account_id: u64) -> system::RawOrigin<u64> {
+pub fn origin_for(account_id: u64) -> system::RawOrigin<u64> {
 	system::Origin::<Test>::Signed(account_id)
 }
 
 // Test environment function to create collectible and return it
-fn create_collectible() -> ([u8; 16], u64) {
+pub fn create_collectible() -> ([u8; 16], u64) {
 	let (unique_id, color) = CollectiblesModule::gen_unique_id();
 	let minter: u64 = 1;
 	CollectiblesModule::mint(&minter, unique_id, color).unwrap();
