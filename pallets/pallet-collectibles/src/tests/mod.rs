@@ -6,7 +6,7 @@ mod tests;
 use crate as pallet_collectibles;
 use frame_support::{
 	assert_noop, assert_ok,
-	traits::{ConstU16, ConstU32, ConstU64, Currency},
+	traits::{ConstU16, ConstU32, ConstU64},
 };
 use frame_system as system;
 
@@ -21,10 +21,6 @@ pub const U64_MAX: u64 = u64::MAX;
 type UncheckedExtrinsic = frame_system::mocking::MockUncheckedExtrinsic<Test>;
 type Block = frame_system::mocking::MockBlock<Test>;
 type Balance = u64;
-// TODO: Resolve problem with Err(InsufficientBalance)
-// type DepositBalanceOf<T> = <<T as pallet_collectibles::Config>::Currency as Currency<
-// 	<T as frame_system::Config>::AccountId,
-// >>::Balance;
 
 // Configure a mock runtime to test the pallet.
 frame_support::construct_runtime!(

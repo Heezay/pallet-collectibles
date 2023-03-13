@@ -78,14 +78,6 @@ fn set_price_and_buy_collectible() {
 		System::reset_events();
 		System::set_block_number(2);
 		let _selected_price: u64 = 101;
-		// TODO: Resolve problem with Err(InsufficientBalance)
-		// Currency::<Test>::deposit_creating(&receiver.into(), DepositBalanceOf::<Test>::max_value());
-		// CollectiblesModule::buy_collectible(
-		// 	origin_for(receiver).into(),
-		// 	collectible_id,
-		// 	selected_price,
-		// )
-		// .unwrap();
 		assert_noop!(
 			CollectiblesModule::buy_collectible(origin_for(receiver).into(), collectible_id, 0,),
 			Error::<Test>::BidPriceTooLow
