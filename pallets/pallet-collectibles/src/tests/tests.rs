@@ -37,8 +37,6 @@ fn transfer_collectible() {
 			receiver,
 			collectible_id
 		));
-		let result = crate::OwnerOfCollectibles::<Test>::get(receiver);
-		println!(" result {:?}", result);
 		System::assert_has_event(tests::RuntimeEvent::CollectiblesModule(
 			Event::<Test>::TransferSucceeded {
 				from: minter,
