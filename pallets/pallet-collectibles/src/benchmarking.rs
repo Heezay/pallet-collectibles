@@ -18,7 +18,10 @@ benchmarks! {
 		let unique_id: [u8; 16] = [1, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17];
 		let collectible_id = CollectiblesModule::<T>::mint(&caller, unique_id, Color::Red).unwrap();
 		let receiver = account::<T::AccountId>("receiver", 1u32, 2u32);
-	  }: transfer(RawOrigin::Signed(caller), receiver, collectible_id)
+	  }: transfer(RawOrigin::Signed(caller), receiver.clone(), collectible_id)
+	  verify {
+		assert_eq!(OwnerOfCollectibles::<T>::get(receiver), vec![unique_id]);
+	}
 
 	set_price {
 		let caller: T::AccountId = whitelisted_caller();

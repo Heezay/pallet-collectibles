@@ -37,6 +37,8 @@ fn transfer_collectible() {
 			receiver,
 			collectible_id
 		));
+		let result = crate::OwnerOfCollectibles::<Test>::get(receiver);
+		println!(" result {:?}", result);
 		System::assert_has_event(tests::RuntimeEvent::CollectiblesModule(
 			Event::<Test>::TransferSucceeded {
 				from: minter,
@@ -75,9 +77,6 @@ fn set_price_and_buy_collectible() {
 			),
 			Error::<Test>::NotOwner
 		);
-		System::reset_events();
-		System::set_block_number(2);
-		let _selected_price: u64 = 101;
 		assert_noop!(
 			CollectiblesModule::buy_collectible(origin_for(receiver).into(), collectible_id, 0,),
 			Error::<Test>::BidPriceTooLow
