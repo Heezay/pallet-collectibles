@@ -20,7 +20,7 @@ benchmarks! {
 		let receiver = account::<T::AccountId>("receiver", 1u32, 2u32);
 	  }: transfer(RawOrigin::Signed(caller), receiver.clone(), collectible_id)
 	  verify {
-		assert_eq!(OwnerOfCollectibles::<T>::get(receiver), vec![unique_id]);
+		assert_eq!(OwnerOfCollectibles::<T>::get(receiver), [unique_id].to_vec());
 	}
 
 	buy_collectible {
@@ -38,7 +38,7 @@ benchmarks! {
         let bid_price = T::Currency::free_balance(&receiver);
 	}: buy_collectible(RawOrigin::Signed(receiver.clone()), collectible_id,  bid_price)
 	verify {
-		assert_eq!(OwnerOfCollectibles::<T>::get(receiver), vec![unique_id]);
+		assert_eq!(OwnerOfCollectibles::<T>::get(receiver), [unique_id].to_vec());
 	}
 
 	impl_benchmark_test_suite!(CollectiblesModule, crate::tests::new_test_ext(), crate::tests::Test);
