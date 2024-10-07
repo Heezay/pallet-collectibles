@@ -280,6 +280,7 @@ pub mod pallet {
 		/// Create a new unique collectible.
 		///
 		/// The actual collectible creation is done in the `mint()` function.
+		#[pallet::call_index(0)]
 		#[pallet::weight(0)]
 		pub fn create_collectible(origin: OriginFor<T>) -> DispatchResult {
 			// Make sure the caller is from a signed origin
@@ -297,6 +298,7 @@ pub mod pallet {
 		/// Transfer a collectible to another account.
 		/// Any account that holds a collectible can send it to another account.
 		/// Transfer resets the price of the collectible, marking it not for sale.
+		#[pallet::call_index(1)]
 		#[pallet::weight(0)]
 		pub fn transfer(
 			origin: OriginFor<T>,
@@ -312,6 +314,7 @@ pub mod pallet {
 		}
 
 		/// Update the collectible price and write to storage.
+		#[pallet::call_index(2)]
 		#[pallet::weight(0)]
 		pub fn set_price(
 			origin: OriginFor<T>,
@@ -335,6 +338,7 @@ pub mod pallet {
 
 		/// Buy a collectible. The bid price must be greater than or equal to the price
 		/// set by the collectible owner.
+		#[pallet::call_index(3)]
 		#[pallet::weight(0)]
 		pub fn buy_collectible(
 			origin: OriginFor<T>,
